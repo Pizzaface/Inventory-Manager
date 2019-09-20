@@ -1,0 +1,60 @@
+{% extends 'layout.html' %}
+
+{% block head %}
+<link href="{{ url_for('static', filename='fontawesome-free-5.9.0-web/css/all.css') }}" rel="stylesheet" type="text/css">
+<link rel="stylesheet" href="{{ url_for('static', filename='fonts/css/all.min.css') }}">
+
+
+{% endblock %}
+
+{% block navbar_left %}
+{% endblock %}
+
+{% block body %}
+	<center>
+		<div class="row h-100 d-flex justify-content-center">
+			<div class="col-lg-6">
+				<h1>Mark Item Unsold</h1>
+				<form action="{{ url_for('removeItem') }}" method="POST" class="mt-5" id="removeForm"> 
+					<input type="text" id="remove" class="form-control" name="itemID" />
+					<input id="submit" type="submit" class="btn btn-primary mt-3">
+				</form>
+
+				<table class="table table-hover" id="marked-items">
+					<thead class='text-center'>
+						<th>Item Barcode</th>
+						<th>Item Type</th>
+						<th>Item Category</th>
+						<th>Item Subcategory</th>
+					</thead>
+					<tbody>
+						
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</center>
+{% endblock %}
+
+{% block scripts %}
+	<script type="text/javascript">
+		$("#remove").focus()
+		
+		$("#removeForm").on("submit", function(e) {
+			e.preventDefault()
+			$.post("{{ url_for('removeItem') }}", {"itemID": $("#remove").val()}, function(data) {
+				if (data != false) {
+					$("#message-container").prepend("<div class=\"alert alert-success alert-dismissible fade show\" role=\"alert\"><strong>Item Marked Unsold</strong><button type=\"button\" class=\"close\" data-dismiss=\"alert\" aria-label=\"Close\"><span aria-hidden=\"true\">&times;</span></button></div>")
+					$("#marked-items tbody").append("<tr class='text-center'><td>" + $("#remove").val() + "</td><td>" + data['type'] + "</td><td>" + data['category'] + "</td><td>" + data['subcategory'] + "</td></tr>")
+
+					$("#remove").val("")
+					$("#remove").focus()
+				}
+				if (data == false) {
+					$("#message-container").prepend("<div class=\"alert alert-danger alert-dismissible fade show\" role=\"alert\"><strong>There was an issue marking that product.</strong><button type=\"button\" class=\"close\" data-dismiss=\"alert\" aria-label=\"Close\"><span aria-hidden=\"true\">&times;</span></button></div>")
+					$("#remove").focus()
+				}
+			})
+		});
+	</script>
+{% endblock %}

@@ -1,0 +1,97 @@
+{% extends 'layout.html' %}
+
+{% block head %}
+<link href="{{ url_for('static', filename='fontawesome-free-5.9.0-web/css/all.css') }}" rel="stylesheet" type="text/css">
+<link rel="stylesheet" href="{{ url_for('static', filename='fonts/css/all.min.css') }}">
+
+<style type="text/css">
+	.w-35 {
+		width: 35%;
+	}
+</style>
+{% endblock %}
+
+{% block navbar_left %}
+{% endblock %}
+
+{% block body %}
+	<form action="{{ url_for('editAttribute', id=oldAttr.id) }}" id="attr-form" method="POST" enctype="multipart/form-data">
+		<div class="container w-50">
+			<center><h1>Add a Attribute</h1></center>
+			<div class="form-group">
+				<label><h3>Attribute Name</h3></label>
+				<input type="text" class="form-control" name="attr_name" value="{{ oldAttr.attr_name }}"/>
+			</div>
+			<div class="form-group">
+				<table class="table table-hover" id="inputs">
+					<col >
+
+					<thead>
+						<th class="text-center">Input Values</th>
+						<th class="text-center">Price Change</th>
+						<th class="text-center"></th>
+					</thead>
+					<tbody>
+						{% for name, value in attr_values.items() %}
+							<tr>
+								<td class="text-center">{{ name }}</td>
+								<td class="text-center">{{ value }}</td>
+								<td class="text-center"><a href="#" class="remover"><i class="fas pl-2 fa-trash color-red"></i></a></td>
+							</tr>
+						{% endfor %}						
+					</tbody>
+						
+				</table>
+				<div class="form-group border">
+					<center>
+						<b>Value:</b> <input type="text" class="form-control w-25 mr-2" id="input-name" placeholder="Value Name" /><br>
+						<b>Price Increase/Decrease:</b><input type="number" step="0.01" max="99999999999" name="price" class="form-control w-35 ml-2" placeholder="Price Increase/Decrease" value="0.00" id="input-price" /><br>
+						<button class="btn btn-primary w-50 mt-2" id="input-adder"><i class="fas fa-plus"></i> Add Value</button>
+					</center>
+				</div>
+			</div>
+			<button type="submit" class="btn btn-primary">Submit</button>
+		</div>
+	</form>
+{% endblock %}
+
+{% block scripts %}
+	<script type="text/javascript">
+		$(".remover").on("click", function() {
+			_t = this
+
+			$(_t).parent().parent().remove()
+		});
+
+		$("#input-adder").on("click", function(e) {
+			e.preventDefault()
+			if ($("#input-name").val() != "") {
+				$("#inputs tbody").append("<tr><td class='text-center'>" + $("#input-name").val() + "</td><td class='text-center'>$" + $("#input-price").val() + "</td><td class=\"text-center\"><a href=\"#\" class=\"remover\"><i class=\"fas pl-2 fa-trash color-red\"></i></a></td></tr>")
+				$("#input-name").val("")
+				$("#input-price").val("0.00")
+			}
+
+
+		})
+
+		$("#attr-form").submit(function() {
+			var data = {};
+			var lastTitle = "";
+			$(this).find('#inputs > tbody tr').each(function (rowIndex, r) {
+				$(this).find('td').each(function (colIndex, c) {
+					if (colIndex == 0) {
+						lastTitle = c.textContent.trim()
+						data[c.textContent.trim()] = ""
+						return
+					}
+					data[lastTitle] = c.textContent.trim();
+				});
+			});
+
+			$("<input />").attr("type", "hidden").attr("value", JSON.stringify(data)).attr("name","attr_values").appendTo("#attr-form")
+
+			return true;
+		})
+		
+	</script>
+{% endblock %}

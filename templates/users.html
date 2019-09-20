@@ -1,0 +1,72 @@
+{% extends 'layout.html' %}
+
+{% block head %}
+<link href="{{ url_for('static', filename='fontawesome-free-5.9.0-web/css/all.css') }}" rel="stylesheet" type="text/css">
+<link rel="stylesheet" href="{{ url_for('static', filename='fonts/css/all.min.css') }}">
+<script src="{{ url_for('static', filename='js/jquery.tablesorter.js') }}"></script>
+<script src="{{ url_for('static', filename='js/jquery.tablesorter.widgets.js') }}"></script>
+
+{% endblock %}
+
+{% block navbar_left %}
+
+{% endblock %}
+
+{% block body %}
+<div class="container">
+	<div class="float-right"><a href="{{ url_for('addUser') }}"><button class="btn btn-success"><i class="fas fa-plus"></i></button></a></div>
+	<center>
+		<h1>Users</h1>
+		<table class="table table-hover" id="inventory-table">
+		  	<thead>
+				<tr>
+					<th scope="col">Employee Name</th>
+					<th scope="col">Employee Number</th>
+					<th scope="col">Employee Type</th>
+				</tr>	
+	  		</thead>
+		  	<tbody>
+		  		{% for user in users %}
+					<tr {% if user.admin == 1 %}class="table-danger"{% endif %}>
+					  	<td>{{ user.name }}</td>
+					  	<td>{% set id = user.id|string %}{{ id.zfill(6) }}</td>
+					  	<td>{% if user.admin == 1 %}Administrator{% else %}User{% endif %}</td>
+					  	<td><a href="{{ url_for('editUser', id=user.id) }}""><i style="font-size:20px;" class="fas p-2 fa-edit color-yellow"></i></a><a href="#" class="remover" data-delete="{{ user.id }}"><i style="font-size:20px;" class="fas p-2 fa-trash color-red"></i></a></td>
+					</tr>
+				{% endfor %}
+		  	</tbody>
+		</table>
+	</center>
+</div>
+{% endblock %}
+
+{% block scripts %}
+	<script type="text/javascript">
+		$(".remover").on("click", function() {
+			_t = this
+			$.post("{{ url_for('deleteUser') }}", {"userID": $(this).attr("data-delete")}, function(data) {
+				if (data == true) {
+					$("#wrap").prepend("<div class=\"alert alert-success alert-dismissible fade show\" role=\"alert\"><strong>User Removed</strong><button type=\"button\" class=\"close\" data-dismiss=\"alert\" aria-label=\"Close\"><span aria-hidden=\"true\">&times;</span></button></div>")
+					$(_t).parent().parent().remove()
+				}
+				if (data == false) {
+					$("#wrap").prepend("<div class=\"alert alert-danger alert-dismissible fade show\" role=\"alert\"><strong>There was an issue deleting that user.</strong><button type=\"button\" class=\"close\" data-dismiss=\"alert\" aria-label=\"Close\"><span aria-hidden=\"true\">&times;</span></button></div>")
+				}
+			})
+		})
+	</script>
+
+
+	<script type="text/javascript">
+		$(function(){
+			$('table').tablesorter({
+				widgets        : ['zebra', 'columns'],
+				usNumberFormat : false,
+				sortReset      : true,
+				sortRestart    : true
+			});
+		});
+
+		$('#tasks').infiniteScroll(itemSelector='tr.task', dataPath='/tasks/load_more_tasks')
+	</script>
+{% endblock %}

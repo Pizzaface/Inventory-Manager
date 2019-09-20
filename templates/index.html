@@ -1,0 +1,87 @@
+{% extends 'layout.html' %}
+
+{% block head %}
+<link href="{{ url_for('static', filename='fontawesome-free-5.9.0-web/css/all.css') }}" rel="stylesheet" type="text/css">
+<link rel="stylesheet" href="{{ url_for('static', filename='fonts/css/all.min.css') }}">
+
+<style type="text/css">
+	@media (max-width: 991.98px) { 
+		body {
+			overflow: scroll !important;
+		}
+	}
+	html, body {
+		height: 100vh;
+	}
+	body {
+		overflow: hidden;
+	}
+</style>
+{% endblock %}
+
+{% block navbar_left %}
+{% endblock %}
+
+{% block body %}
+
+	<center>
+		<div class="row vh-100 justify-content-center">
+			<div class="col-lg-5 col-md-12 h-100">
+				<a href="{{ url_for('addItem') }}">
+					<button type="button" class="form-control btn btn-primary h-50 mt-lg-0 mt-sm-1">
+						<i class="far fa-plus-square fa-5x"></i> <br>
+						Add Item to Inventory
+					</button>
+				</a>
+				{% if admin == 1 %}
+					<div class="row h-50">
+						<div class="col-lg-6 col-md-12 pr-lg-0">
+							<a href="{{ url_for('reports') }}">
+								<button type="button" class="form-control btn btn-success h-50 mt-lg-2 mt-sm-1">
+									<i class="fas fa-receipt fa-3x"></i><br>
+									Reports
+								</button>
+							</a>
+						</div>
+						<div class="col-lg-6 col-md-12 pl-lg-1 ">
+							<a href="{{ url_for('inventory') }}">
+								<button type="button" class="form-control btn btn-success h-50 mt-lg-2 mt-sm-1">
+									<i class="fas fa-boxes fa-3x"></i><br>
+									Inventory
+								</button>
+							</a>
+						</div>
+					</div>
+				{% endif %}
+			</div>
+			<div class="col-lg-5 col-md-12 h-100">
+				<a href="{{ url_for('removeItem') }}">
+					<button type="button" class="form-control btn btn-danger h-50 mt-lg-0 mt-sm-1">
+						<i class="far fa-minus-square fa-5x"></i> <br>
+						Mark Item Unsold
+					</button>
+				</a>
+				{% if admin == 1 %}
+					<div class="row h-50">
+						<div class="col-lg-6 col-md-12 pr-lg-0 mt-sm-1">
+							<a href="{{ url_for('items') }}">
+								<button type="button" class="text-white form-control btn btn-info h-50 mt-lg-1 mt-sm-1">
+									<i class="fas fa-box fa-3x"></i> <br>
+									Categorization Options
+								</button>
+							</a>
+						</div>
+						<div class="col-lg-6 col-md-12 pl-lg-1 ">
+							<a href="{{ url_for('users') }}">
+								<button type="button" class="form-control btn btn-info text-white h-50 mt-lg-2 mt-sm-1">
+									<i class="fas fa-user fa-3x"></i> <br>
+									User Management
+								</button>
+							</a>
+						</div>
+					</div>
+				{% endif %}
+			</div>
+		</div>
+	</center>
+{% endblock %}

@@ -1,0 +1,65 @@
+{% extends 'layout.html' %}
+
+{% block head %}
+<link href="{{ url_for('static', filename='fontawesome-free-5.9.0-web/css/all.css') }}" rel="stylesheet" type="text/css">
+<link rel="stylesheet" href="{{ url_for('static', filename='fonts/css/all.min.css') }}">
+{% endblock %}
+
+{% block navbar_left %}
+{% endblock %}
+
+{% block body %}
+	<form action="{{ url_for('editSubcategory', sub_id=subcategory.id) }}" method="POST" enctype="multipart/form-data">
+		<div class="container w-50">
+			<center><h1>Editing {{ subcategory.name }}</h1></center>
+			<div class="form-group">
+				<label><h3>Category</h3></label>
+				<select class="form-control" name="category">
+					{% for category in categories %}
+						{% if category[0] == subcategory.category_id %}
+						<option selected="selected" value="{{ category[0] }}">{{ category[1] }}</option>
+						{% else %}
+						<option value="{{ category[0] }}">{{ category[1] }}</option>
+						{% endif %}
+					{% endfor %}
+				</select>
+			</div>
+			<div class="form-group">
+				<label><h3>Subcategory Name</h3></label>
+				<input type="text" name="name" value='{{ subcategory.name }}' class="form-control" />
+			</div>
+			<div class="form-group">
+				<label><h3>Price</h3></label>
+				<input type="number" min="0.01" step="0.01" value="{{ subcategory.getPrice() }}" max="99999999999" name="price" class="form-control" />
+			</div>
+			<div class="form-group">
+				<label><h3>Update Icon</h3></label>
+				<input class="form-control" type="file" name="icon">
+			</div>
+			<div class="form-group">
+				<label><h3>Sort Order</h3></label>
+				<input type="number" min="0" step="1" value="{{ subcategory.sort_order }}" max="99999999999" name="sort_order" class="form-control" />
+			</div>
+			<div class="form-group">
+				<label><h3>Button Color</h3></label>
+				<select name="button_color" class="form-control">
+					<option value="primary" {% if subcategory.button_color == 'primary' %} selected="" {% endif %}>Blue</option>
+					<option value="warning" {% if subcategory.button_color == 'warning' %} selected="" {% endif %}>Yellow</option>
+					<option value="success" {% if subcategory.button_color == 'success' %} selected="" {% endif %}>Green</option>
+					<option value="danger" {% if subcategory.button_color == 'danger' %} selected="" {% endif %}>Red</option>
+					<option value="secondary" {% if subcategory.button_color == 'secondary' %} selected="" {% endif %}>Black</option>
+				</select>
+			</div>
+			<div class="form-group">
+				<label><h3>Attributes</h3></label>
+				<br>
+				<span id="attr-checkboxes" >
+					{% for attribute in attributes %}
+						<h5><input type="checkbox" {% if attribute.id in current_attrs %} checked {% endif %} class="ml-3 mr-2" name="{{ attribute.id }}"> {{ attribute.attr_name }}</h5><br>
+					{% endfor %}
+				</span>
+			</div>
+			<button type="submit" class="btn btn-primary">Submit</button>
+		</div>
+	</form>
+{% endblock %}

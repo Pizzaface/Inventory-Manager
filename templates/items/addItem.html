@@ -1,0 +1,312 @@
+{% extends 'layout.html' %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='fonts/css/all.min.css') }}">
+<link rel="stylesheet" href="https://cdn.rawgit.com/daneden/animate.css/master/animate.css">
+<script src="{{ url_for('static', filename='js/jquery.animateCSS.min.js') }}"></script>
+<style type="text/css">
+	.h-15 {
+		height: 15%;
+	}
+	.h-30 {
+		height: 30%;
+	}
+</style>
+{% endblock %}
+
+
+{% block navbar_left %}
+{% endblock %}
+
+{% block body %}
+	<form id="itemForm" action="">
+
+	<!-- One "tab" for each step in the form: -->
+	<div class="container-fluid">
+		<center id="questionaire">
+			
+			<h1>What type of item is this?</h1>
+			<center>
+				<div class="row h-50">
+				{% for itemType in itemTypes %}
+			    	<div class="col-lg-3 p-1">
+			    		<button type="button" class="form-control btn btn-primary h-50" id="{{ itemType.id }}">
+							<i class="fas {{ itemType.icon }} fa-3x"></i> <br>
+							<h3 class="mt-2">{{ itemType.name }}</h3>
+						</button>
+			    	</div>
+
+			        <!-- if last column in row -->
+			        {% if loop.index is divisibleby(4) and not loop.last %}
+			        </div><div class="row">
+			        {% endif %}
+
+			    {% endfor %}
+			   	</div>
+			</center>
+			<!-- <div class="row h-100">
+
+				<div class="col-lg-4">
+					<button type="button" class="form-control btn btn-primary h-50" id="soft-item">
+						<i class="fas fa-tshirt fa-5x"></i> <br>
+						<h3 class="mt-2">Soft Item / Objeto Suave</h3>
+					</button>
+				</div>
+				<div class="col-lg-4">
+					<button type="button" class="form-control btn btn-primary h-50" id="hard-item">
+						<i class="fas fa-blender fa-5x"></i> <br>
+						<h3 class="mt-2">Hard Item / Artículo Duro</h3>
+					</button>
+				</div>
+			</div> -->
+		</center>
+		{% for type_id, categories in typeCategories.items() %}
+			<center id="{{ type_id }}-item-categories" class="d-none">
+				<h1>Item Categories</h1>
+				<div class="row h-50">
+				{% for category in categories %}
+			    	<div class="col-lg-3 p-1">
+			    		<button type="button" class="form-control btn btn-primary h-50 icbtn" id="{{ category.id }}">
+							<i class="fas {{ category.icon }} fa-3x"></i> <br>
+							<h3 class="mt-2">{{ category.name }}</h3>
+						</button>
+			    	</div>
+
+			        <!-- if last column in row -->
+			        {% if loop.index is divisibleby(4) and not loop.last %}
+			        </div><div class="row mt-1">
+			        {% endif %}
+
+			    {% endfor %}
+			   	</div>
+
+				</div>
+			</center>
+		{% endfor %}
+
+		{% for category_id, subcategories in typeSubcategories.items() %}
+			<center id="{{ category_id }}-item-subcategories" class="d-none">
+				<h1>Item Subcategories</h1>
+				<div class="row h-15 w-75">
+				{% for subcategory in subcategories %}
+			    	<div class="col-lg-2 p-1">
+			    		<button type="button" class="form-control btn btn-{{ subcategory.button_color }} h-100 iscbtn" id="{{ subcategory.id }}">
+							<img src="{{ url_for('static', filename='img/' +  subcategory.icon) }}" height="50px;" /> <br>
+							<h5 class="mt-2">{{ subcategory.name }}</h5>
+						</button>
+			    	</div>
+
+			        <!-- if last column in row -->
+			        {% if loop.index is divisibleby(6) and not loop.last %}
+			        </div><div class="row mt-2 h-15 w-75">
+			        {% endif %}
+
+			    {% endfor %}
+			   	</div>
+
+				</div>
+			</center>
+		{% endfor %}
+
+
+
+		<center id="attr-pane" class="d-none">
+			<span id="attr-items"></span>
+			<br><button id="attr-next" class="btn btn-primary mt-3 btn-lg">Next <i class="fas fa-right-arrow"></i> </button>
+		</center>
+
+		<center id="quantity-pane" class="d-none">
+			<h1>How many are you checking in?</h1>
+			<div class="row h-20 mt-1">
+				<div class="col-lg-1"></div>
+				<div class="col-lg-1 p-2">
+					<button type="button" class="form-control btn btn-success h-75 qbtn" id="1">
+						<h3 class="mt-2">1</h3>
+					</button>
+				</div>
+				<div class="col-lg-1 p-2">
+					<button type="button" class="form-control btn btn-success h-75 qbtn" id="2">
+						<h3 class="mt-2">2</h3>
+					</button>
+				</div>
+				<div class="col-lg-1 p-2">
+					<button type="button" class="form-control btn btn-success h-75 qbtn" id="3">
+						<h3 class="mt-2">3</h3>
+					</button>
+				</div>
+				<div class="col-lg-1 p-2">
+					<button type="button" class="form-control btn btn-success h-75 qbtn" id="4">
+						<h3 class="mt-2">4</h3>
+					</button>
+				</div>
+				<div class="col-lg-1 p-2">
+					<button type="button" class="form-control btn btn-success h-75 qbtn" id="5">
+						<h3 class="mt-2">5</h3>
+					</button>
+				</div>
+				<div class="col-lg-1 p-2">
+					<button type="button" class="form-control btn btn-success h-75 qbtn" id="6">
+						<h3 class="mt-2">6</h3>
+					</button>
+				</div>
+				<div class="col-lg-1 p-2">
+					<button type="button" class="form-control btn btn-success h-75 qbtn" id="7">
+						<h3 class="mt-2">7</h3>
+					</button>
+				</div>
+				<div class="col-lg-1 p-2">
+					<button type="button" class="form-control btn btn-success h-75 qbtn" id="8">
+						<h3 class="mt-2">8</h3>
+					</button>
+				</div>
+				<div class="col-lg-1 p-2">
+					<button type="button" class="form-control btn btn-success h-75 qbtn" id="9">
+						<h3 class="mt-2">9</h3>
+					</button>
+				</div>
+				<div class="col-lg-1 p-2">
+					<button type="button" class="form-control btn btn-success h-75 qbtn" id="10">
+						<h3 class="mt-2">10</h3>
+					</button>
+				</div>
+				<div class="col-lg-1"></div>
+			</div>
+		</center>
+	</div>
+
+	<input type="hidden" name="item_type" id="item-type"/>
+	<input type="hidden" name="item_category" id="item-category"/>
+	<input type="hidden" name="item_subcategory" id="item-subcategory"/>
+	<input type="hidden" name="item_attributes" id="item-attributes"/>
+	<input type="hidden" name="quantity" id="quantity" />
+
+	</form>
+
+	<div class="modal" tabindex="-1" role="dialog" id="successful">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">Action Successful</h5>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div class="modal-body">
+					<center>
+						<i class="far fa-check-square animated tada fa-5x"></i>
+						<p>Items were successfully added.</p>
+					</center>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+	<script type="text/javascript">
+		{% for itemType in itemTypes %}
+			$("#{{ itemType.id }}").on("click", function() {
+				$("#questionaire").animateCSS("slideOutLeft", 250, function() {
+					$("#{{ itemType.id }}-item-categories").removeClass("d-none")
+					$("#{{ itemType.id }}-item-categories").animateCSS("slideInRight", 250)
+					$("#questionaire").addClass("d-none")
+				})
+				$("#item-type").val("{{ itemType.id }}")
+			})
+
+	    {% endfor %}
+		// $("#soft-item").on("click", function(){
+		// 	$("#questionaire").animateCSS("slideOutLeft", 250, function() {
+		// 		$("#soft-item-categories").removeClass("d-none")
+		// 		$("#soft-item-categories").animateCSS("slideInRight", 250)
+		// 		$("#questionaire").addClass("d-none")
+		// 	})
+		// 	$("#item-type").val("soft")
+		// })
+		$(".icbtn").on("click", function(e){
+			_t = this
+			$("#item-category").val(_t.id.split("-")[0])
+			$("#" + $("#item-type").val() + "-item-categories").animateCSS("slideOutLeft", 250, function() {
+				$("#" + _t.id.split("-")[0] + "-item-subcategories").removeClass("d-none")
+				$("#" + _t.id.split("-")[0] + "-item-subcategories").animateCSS("slideInRight", 250)
+				$("#" + $("#item-type").val() + "-item-categories").addClass("d-none")
+			})
+			
+		})
+		$(".iscbtn").on("click", function(e){
+			var _t = this;
+			$("#" + $("#item-category").val() + "-item-subcategories").animateCSS("slideOutLeft", 250, function() {
+				data = {
+					"subcategoryID": _t.id
+				}
+				$.post( "{{ url_for('getAttributes') }}", data, function( data ) {
+					if (Object.keys(data).length == 0) {
+						$("#quantity-pane").removeClass("d-none")
+						$("#quantity-pane").animateCSS("slideInRight", 250)
+					} else {
+						$.each(data, function(attr_key, attr_val) {
+							var i = 0;
+							attr_key = attr_key.replace("'", "").replace("\"", "").replace("#", "").replace("$", "").replace(" ", "_")
+
+							$("#attr-items").prepend("<h4>" + attr_key.replace("_", " ") + "</h4><br><div class='btn-group btn-group-toggle' data-toggle='buttons' id='" + attr_key.replace(" ", "_") + "-btns'></div>")
+							$.each(JSON.parse(attr_val), function(key, value) {
+								$('#' + attr_key.replace(" ", "_") + "-btns").append('<label class="btn btn-primary btn-lg"><input type="radio" value="' + key + '" name="' + attr_key.replace(" ", "_") + '" id="' + attr_key.replace(" ", "_") + i + '" data-price="' + value.replace("$", "") + '" autocomplete="off"><h5>' + key + '</h5></label>')
+								i = i + 1
+							})
+						})
+						$("#attr-pane").removeClass("d-none")
+						$("#attr-pane").animateCSS("slideInRight", 250)
+					}
+						
+				});
+				
+				$("#" + $("#item-category").val() + "-item-subcategories").addClass("d-none")
+			})
+			$("#item-subcategory").val(_t.id)
+		})
+
+		$("#attr-next").on('click', function(e){
+			e.preventDefault();
+			var attribute = {};
+			$("#attr-pane input[type='radio']:checked").each(function() {
+				var _t = this;
+				attribute[$(_t).attr('name')] = $(_t).attr('value');
+			});
+			$("#item-attributes").val(JSON.stringify(attribute))
+			$("#attr-pane").animateCSS("slideOutLeft", 250, function() {
+				$("#quantity-pane").removeClass("d-none")
+				$("#quantity-pane").animateCSS("slideInRight", 250)
+				$("#attr-pane").addClass("d-none")
+			})
+		})
+		$(".qbtn").on("click", function(e){
+			
+			$("#quantity").val(this.id)
+			data = {
+				"item_type": $("#item-type").val(),
+				"item_category": $("#item-category").val(),
+				"item_subcategory": $("#item-subcategory").val(),
+				"quantity": $("#quantity").val(),
+				"item_attributes": $("#item-attributes").val()
+			}
+			
+			$.post( "{{ url_for('addItem') }}", data, function( data ) {
+				if (data != false) { 
+					$('#successful').modal('show')
+					$("#quantity-pane").animateCSS("slideOutLeft", 250, function() {
+						$("#attr-items > *").remove()
+						$("#item-attributes").val("{}")
+						$("#questionaire").removeClass("d-none")
+						$("#questionaire").animateCSS("slideInRight", 250)
+						$("#quantity-pane").addClass("d-none")
+					})
+						
+				}
+			});
+
+		})
+		 
+	</script>
+{% endblock %}

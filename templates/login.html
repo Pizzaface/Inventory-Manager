@@ -1,0 +1,149 @@
+<head>
+	<link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+	<script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
+	<link rel="stylesheet" href="{{ url_for('static', filename='fonts/css/all.min.css') }}">
+</head>
+
+<body>
+	<style>
+	body {
+		background: #3fa2fa;
+		color:white !important;
+	}
+	.modal-content {
+		border-radius: 30px;
+	}
+	.modal {
+		position: relative;
+		margin:auto;
+
+	}
+	a:hover {
+		text-decoration: none;
+	}
+	.modal-footer {border-top: 0px; padding-top: 20px;}
+	.modal-header {border-bottom: 0px; }
+
+	#back-btn {
+		padding-right: 5px !important;
+	}
+	</style>
+
+	<!--login modal-->
+	<div id="loginModal" class="modal show" tabindex="-1" role="dialog" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content bg-dark mx-auto">
+					<div class="modal-header mx-auto">
+							<img src="{{ url_for('static', filename='img/goodwill.png') }}" width="165px;" class="img-fluid pt-3" />
+					</div>
+					<div class="modal-body  p-sm-0" id="form-register-login">
+							{% if error %}
+								<div class="alert alert-danger fade show" role="alert">
+									{{ error }}
+									<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+										<span aria-hidden="true">&times;</span>
+									</button>
+								</div>
+							{% endif %}
+							
+							<center>
+								<form action="{{ url_for('login') }}" method="POST" id="login-form">
+									<input type="hidden" name="username" id="uname">
+									<input type="hidden" name="password" id="pwd">
+								</form>
+								<div class="col-md-12 center-block" id="find-account-form">
+									<div class="form-group ">
+										<div class="btn-group-vertical" role="group">
+										    <div class="btn-group">
+										        <input class="text-center form-control-lg mb-2" id="asc-id" name="asc-id" placeholder="Associate ID #">
+										    </div>
+										    <div class="btn-group">
+										        <button type="button" class="btn btn-dark py-1" onclick="document.getElementById('asc-id').value=document.getElementById('asc-id').value + '1';"><h3>1</h3></button>
+										        <button type="button" class="btn btn-dark py-1" onclick="document.getElementById('asc-id').value=document.getElementById('asc-id').value + '2';"><h3>2</h3></button>
+										        <button type="button" class="btn btn-dark py-1" onclick="document.getElementById('asc-id').value=document.getElementById('asc-id').value + '3';"><h3>3</h3></button>
+										    </div>
+										    <div class="btn-group">
+										        <button type="button" class="btn btn-dark py-1" onclick="document.getElementById('asc-id').value=document.getElementById('asc-id').value + '4';"><h3>4</h3></button>
+										        <button type="button" class="btn btn-dark py-1" onclick="document.getElementById('asc-id').value=document.getElementById('asc-id').value + '5';"><h3>5</h3></button>
+										        <button type="button" class="btn btn-dark py-1" onclick="document.getElementById('asc-id').value=document.getElementById('asc-id').value + '6';"><h3>6</h3></button>
+										    </div>
+										    <div class="btn-group">
+										        <button type="button" class="btn btn-dark py-1" onclick="document.getElementById('asc-id').value=document.getElementById('asc-id').value + '7';"><h3>7</h3></button>
+										        <button type="button" class="btn btn-dark py-1" onclick="document.getElementById('asc-id').value=document.getElementById('asc-id').value + '8';"><h3>8</h3></button>
+										        <button type="button" class="btn btn-dark py-1" onclick="document.getElementById('asc-id').value=document.getElementById('asc-id').value + '9';"><h3>9</h3></button>
+										    </div>
+										    <div class="btn-group">
+										        <button type="button" class="btn btn-dark px-1 py-1" id="back-btn" onclick="document.getElementById('asc-id').value=document.getElementById('asc-id').value.slice(0, -1);"><i class="fas fa-arrow-left fa-1x"></i></button>
+										        <button type="button" class="btn btn-dark px-1 py-1" style="padding-right: 9px !important;" onclick="document.getElementById('asc-id').value=document.getElementById('asc-id').value + '0';"><h3>0</h3></button>
+										        <button type="button" class="btn btn-dark py-1" onclick="document.getElementById('asc-id').value=document.getElementById('asc-id').value + '';"></button>
+										    </div>
+										</div>
+									</div>
+									<div class="form-group">
+										<button id="find-account" class="btn btn-primary text-white btn-lg btn-block">Find Account</button>
+									</div>
+								</div>
+								<div class="col-md-12 center-block d-none" id="password-form">
+									<div class="form-group ">
+										<div class="btn-group-vertical" role="group">
+										    <div class="btn-group">
+										        <input class="text-center form-control-lg mb-2" type="password" id="password" name="password" placeholder="Passcode">
+										    </div>
+										    <div class="btn-group">
+										        <button type="button" class="btn btn-dark py-1" onclick="document.getElementById('password').value=document.getElementById('password').value + '1';"><h3>1</h3></button>
+										        <button type="button" class="btn btn-dark py-1" onclick="document.getElementById('password').value=document.getElementById('password').value + '2';"><h3>2</h3></button>
+										        <button type="button" class="btn btn-dark py-1" onclick="document.getElementById('password').value=document.getElementById('password').value + '3';"><h3>3</h3></button>
+										    </div>
+										    <div class="btn-group">
+										        <button type="button" class="btn btn-dark py-1" onclick="document.getElementById('password').value=document.getElementById('password').value + '4';"><h3>4</h3></button>
+										        <button type="button" class="btn btn-dark py-1" onclick="document.getElementById('password').value=document.getElementById('password').value + '5';"><h3>5</h3></button>
+										        <button type="button" class="btn btn-dark py-1" onclick="document.getElementById('password').value=document.getElementById('password').value + '6';"><h3>6</h3></button>
+										    </div>
+										    <div class="btn-group">
+										        <button type="button" class="btn btn-dark py-1" onclick="document.getElementById('password').value=document.getElementById('password').value + '7';"><h3>7</h3></button>
+										        <button type="button" class="btn btn-dark py-1" onclick="document.getElementById('password').value=document.getElementById('password').value + '8';"><h3>8</h3></button>
+										        <button type="button" class="btn btn-dark py-1" onclick="document.getElementById('password').value=document.getElementById('password').value + '9';"><h3>9</h3></button>
+										    </div>
+										    <div class="btn-group">
+										        <button type="button" class="btn btn-dark px-1 py-1" id="back-btn" onclick="document.getElementById('password').value=document.getElementById('password').value.slice(0, -1);"><i class="fas fa-arrow-left fa-1x"></i></button>
+										        <button type="button" class="btn btn-dark px-1 py-1" style="padding-right: 9px !important;" onclick="document.getElementById('password').value=document.getElementById('password').value + '0';"><h3>0</h3></button>
+										        <button type="button" class="btn btn-dark py-1" onclick="document.getElementById('password').value=document.getElementById('password').value + '';"></button>
+										    </div>
+										</div>
+									</div>
+									<div class="form-group">
+										<button id="login" class="btn btn-primary text-white btn-lg btn-block">Login</button>
+									</div>
+								</div>
+							</center>
+					</div>
+					<div class="modal-footer">
+					</div>	
+					</div>
+			</div>
+		</div>
+	</div>
+</div>
+</body>
+
+	<script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+	<script type="text/javascript">
+		$(".alert").alert()
+		$("#loginModal").show()
+		$("#find-account").on("click", function() {
+			$("#uname").val($("#asc-id").val())
+
+			$("#find-account-form").fadeOut(500, function() {
+				$("#password-form").removeClass("d-none")
+				$("#password-form").fadeIn(500, function() {
+					$("#login").on("click", function() {
+						$("#pwd").val($("#password").val())
+						$("#login-form").submit()
+					})
+				})
+			})
+		});
+	</script>
+</body>
+

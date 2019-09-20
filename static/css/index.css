@@ -1,0 +1,53 @@
+@font-face {
+    font-family: 'clementine_sketchregular';
+    src: url('clementine-sketch.woff2') format('woff2'),
+         url('clementine-sketch.woff') format('woff'),
+         url('clementine-sketch.ttf') format('truetype'),
+         url('clementine-sketch.svg#clementine_sketchregular') format('svg');
+    font-weight: normal;
+    font-style: normal;
+
+}
+
+body {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow-x:hidden;
+}
+
+html {
+  width: 100%;
+  height: 100%;
+}
+
+
+.navbar {
+	 background-repeat: no-repeat;
+	background-attachment: fixed;
+	background-position: top;
+	background: rgba(13, 55, 91, 1);
+	margin-bottom: 20px;
+}
+
+
+.delay-6s {
+  animation-delay: 6s;
+}
+
+.delay-6-5s {
+  animation-delay: 6.5s;
+}
+
+.delay-7s {
+  animation-delay: 7s;
+}
+
+a:hover {
+	text-decoration: none;
+}
+
+
+.fa-1-5x {
+	font-size: 1.5rem
+}

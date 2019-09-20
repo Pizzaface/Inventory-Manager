@@ -1,0 +1,125 @@
+{% extends 'layout.html' %}
+
+{% block head %}
+<link href="{{ url_for('static', filename='fontawesome-free-5.9.0-web/css/all.css') }}" rel="stylesheet" type="text/css">
+<link rel="stylesheet" href="{{ url_for('static', filename='fonts/css/all.min.css') }}">
+<script src="{{ url_for('static', filename='js/jquery.tablesorter.js') }}"></script>
+<script src="{{ url_for('static', filename='js/jquery.tablesorter.widgets.js') }}"></script>
+
+{% endblock %}
+
+{% block navbar_left %}
+
+{% endblock %}
+
+{% block body %}
+	<center class="container">
+		<h1>Inventory</h1>
+		<table class="table table-hover" id="inventory-table">
+		  	<thead>
+				<tr>
+				  <th scope="col">ID</th>
+				  <th scope="col">Type</th>
+				  <th scope="col">Category</th>
+				  <th scope="col">Subcategory</th>
+				  <th scope="col" data-sorter="false">Expires</th>
+				</tr>	
+	  		</thead>
+		  	<tbody>
+		  		{% for item in unsoldItems %}
+					<tr class="table-danger">
+					  	<th scope="row"><a data-toggle="popover" data-trigger="hover" data-html=true data-content="<img src='{{ url_for('static', filename='tickets/' + item.item_id + '.png') }}' />">{{ item.item_id }}</a></th>
+					  	<td>{{ item.getTypeName() }}</td>
+					  	<td>{{ item.getCategoryName() }}</td>
+					  	<td>{{ item.getSubcategoryName() }}</td>
+					  	<td class="expires">{{ item.getTimeLeft() }}</td>
+					  	<td><a href="#" class="remover" data-delete="{{ item.item_id }}"><i class="fas fa-trash color-red"></i></a></td>
+					</tr>
+				{% endfor %}
+		  		{% for item in expiredItems %}
+					<tr class="table-danger">
+					  	<th scope="row"><a data-toggle="popover" data-trigger="hover" data-html=true data-content="<img src='{{ url_for('static', filename='tickets/' + item.item_id + '.png') }}' />">{{ item.item_id }}</a></th>
+					  	<td>{{ item.getTypeName() }}</td>
+					  	<td>{{ item.getCategoryName() }}</td>
+					  	<td>{{ item.getSubcategoryName() }}</td>
+					  	<td class="expires">{{ item.getTimeLeft() }}</td>
+					  	<td><a href="#" class="remover" data-delete="{{ item.item_id }}"><i class="fas fa-trash color-red"></i></a><a href="#" class="unsold pl-3" data-unsold="{{ item.item_id }}"><img src="{{ url_for('static', filename='img/no-sale.png') }}" width="15px" /></a></td>
+					</tr>
+				{% endfor %}
+		  		{% for item in expiringItems %}
+					<tr class="table-warning">
+					  	<th scope="row"><a data-toggle="popover" data-trigger="hover" data-html=true data-content="<img src='{{ url_for('static', filename='tickets/' + item.item_id + '.png') }}' />">{{ item.item_id }}</a></th>
+					  	<td>{{ item.getTypeName() }}</td>
+					  	<td>{{ item.getCategoryName() }}</td>
+					  	<td>{{ item.getSubcategoryName() }}</td>
+					  	<td class="expires">{{ item.getTimeLeft() }}</td>
+					  	<td><a href="#" class="remover" data-delete="{{ item.item_id }}"><i class="fas fa-trash color-red"></i></a><a href="#" class="unsold pl-3" data-unsold="{{ item.item_id }}"><img src="{{ url_for('static', filename='img/no-sale.png') }}" width="15px" /></a></td>
+					</tr>
+				{% endfor %}
+				{% for item in otherItems %}
+					<tr class="table-primary">
+					  	<th scope="row"><a data-toggle="popover" data-trigger="hover" data-container="#wrap" data-placement="left" data-html=true data-content="<img src='{{ url_for('static', filename='tickets/' + item.item_id + '.png') }}' />">{{ item.item_id }}</a></th>
+					  	<td>{{ item.getTypeName() }}</td>
+					  	<td>{{ item.getCategoryName() }}</td>
+					  	<td>{{ item.getSubcategoryName() }}</td>
+					  	<td class="expires">{{ item.getTimeLeft() }}</td>
+					  	<td><a href="#" class="remover" data-delete="{{ item.item_id }}"><i class="fas fa-trash color-red"></i></a><a href="#" class="unsold pl-3" data-unsold="{{ item.item_id }}"><img src="{{ url_for('static', filename='img/no-sale.png') }}" width="15px" /></a></td>
+					</tr>
+				{% endfor %}
+		  	</tbody>
+		</table>
+	</center>
+{% endblock %}
+
+{% block scripts %}
+	<script type="text/javascript">
+		$("[data-toggle=popover]").popover();
+
+		$(".unsold").on("click", function() {
+			_t = this
+			$.post("{{ url_for('removeItem') }}", {"itemID": $(this).attr("data-unsold")}, function(data) {
+				if (data != false) {
+
+					$("#message-container").append("<div class=\"alert alert-success alert-dismissible fade show\" role=\"alert\"><strong>Item Marked Unsold</strong><button type=\"button\" class=\"close\" data-dismiss=\"alert\" aria-label=\"Close\"><span aria-hidden=\"true\">&times;</span></button></div>");
+
+					$(_t).parent().parent().fadeOut()
+					$(_t).parent().children(".unsold.pl-3").addClass('d-none').removeClass("pl-3")
+					$(_t).parent().removeClass("table-warning")
+					$(_t).parent().removeClass("table-primary")
+					$(_t).parent().parent().addClass("table-danger")
+					$(_t).parent().siblings('td.expires').html("Unsold")
+					$("#inventory-table tbody").prepend($(_t).parent().parent().prop('outerHTML'))
+					$(_t).parent().parent().addClass("d-none")
+				}
+				if (data == false) {
+					$("#message-container").append("<div class=\"alert alert-danger alert-dismissible fade show\" role=\"alert\"><strong>There was an issue deleting that product.</strong><button type=\"button\" class=\"close\" data-dismiss=\"alert\" aria-label=\"Close\"><span aria-hidden=\"true\">&times;</span></button></div>")
+				}
+			})
+		})
+
+		$(".remover").on("click", function() {
+			_t = this
+			$.post("{{ url_for('deleteItem') }}", {"itemID": $(this).attr("data-delete")}, function(data) {
+				if (data != false) {
+					$("#message-container").append("<div class=\"alert alert-success alert-dismissible fade show\" role=\"alert\"><strong>Item Removed</strong><button type=\"button\" class=\"close\" data-dismiss=\"alert\" aria-label=\"Close\"><span aria-hidden=\"true\">&times;</span></button></div>")
+					$(_t).parent().parent().remove()
+				}
+				if (data == false) {
+					$("#message-container").append("<div class=\"alert alert-danger alert-dismissible fade show\" role=\"alert\"><strong>There was an issue deleting that product.</strong><button type=\"button\" class=\"close\" data-dismiss=\"alert\" aria-label=\"Close\"><span aria-hidden=\"true\">&times;</span></button></div>")
+				}
+			})
+		})
+	</script>
+
+
+	<script type="text/javascript">
+		$(function(){
+			$('table').tablesorter({
+				widgets        : ['zebra', 'columns'],
+				usNumberFormat : false,
+				sortReset      : true,
+				sortRestart    : true
+			});
+		});
+	</script>
+{% endblock %}

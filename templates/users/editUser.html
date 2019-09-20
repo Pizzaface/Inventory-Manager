@@ -1,0 +1,48 @@
+{% extends 'layout.html' %}
+
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='fonts/css/all.min.css') }}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-iconpicker/1.10.0/css/bootstrap-iconpicker.min.css">
+<style type="text/css">
+	.h-10 {
+		height: 10%;
+	}
+</style>
+{% endblock %}
+
+{% block navbar_left %}
+{% endblock %}
+
+{% block body %}
+<div class="container">
+	<center><h1>Add a user</h1></center>
+	<form action="{{ url_for('editUser', id=user.id) }}" method="POST" class="form">
+		<div class="form-group">
+			<label><h3>Associate Name</h3></label>
+			<input type="text" required value="{{ user.name }}" class="form-control" name="name" placeholder="Associate Name">
+		</div>
+		<div class="form-group">
+			<label><h3>Associate ID Number</h3></label>
+			<input type="number" required value="{{ user.id }}" class="form-control" name="employeeNumber" min="000000" maxlength="6" minlength="6" step="1" placeholder="Associate Number">
+		</div>
+		<div class="form-group">
+			<label><h3>Reset Associate Passcode (6 Digits)</h3></label>
+			<input type="password" class="form-control" name="password" min="000000" maxlength="6" minlength="6" step="1" placeholder="Associate Passcode">
+		</div>
+		<div class="form-group row">
+			<div class="col-lg-6">
+				<label><h3>User Type</h3></label>
+			</div>
+			<div class="col-lg-6">
+				<select name="admin" class="form-control">
+					<option {% if user.admin == 0 %} selected="selected" {% endif %} value="0">Regular Associate</option>
+					<option {% if user.admin == 1 %} selected="selected" {% endif %} value="1">Administrator</option>
+				</select>
+			</div>
+		</div>
+
+		<center><button type="submit" class=" btn btn-success">Save User</button></center>
+	</form>
+</div>
+{% endblock %}

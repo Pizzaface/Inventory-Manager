@@ -1,0 +1,427 @@
+{% extends 'layout.html' %}
+
+{% block head %}
+<link href="{{ url_for('static', filename='fontawesome-free-5.9.0-web/css/all.css') }}" rel="stylesheet" type="text/css">
+<link rel="stylesheet" href="{{ url_for('static', filename='fonts/css/all.min.css') }}">
+<link rel="stylesheet" href="https://cdn.rawgit.com/daneden/animate.css/master/animate.css">
+<script src="{{ url_for('static', filename='js/jquery.animateCSS.min.js') }}"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.css" integrity="sha256-aa0xaJgmK/X74WM224KMQeNQC2xYKwlAt08oZqjeF0E=" crossorigin="anonymous" />
+{% endblock %}
+
+
+{% block navbar_left %}
+{% endblock %}
+
+{% block body %}
+<center>
+	<nav class="nav nav-pills w-50 nav-fill">
+		<a class="nav-item nav-link active" id="types-tab" data-toggle="tab" href="#items-panel" role="tab" aria-controls="types-panel" aria-selected="true">Item Counts Report</a>
+		<a class="nav-item nav-link" id="users-tab" data-toggle="tab" href="#users-panel" role="tab" aria-controls="users-panel" aria-selected="true">Users Counts Report</a>
+	</nav>
+</center>
+<div class="tab-content" id="myTabContent">
+	<div class="tab-pane fade active show te border" id="items-panel" role="tabpanel" aria-labelledby="item-counts">
+		<center style="margin-bottom: 10rem;">
+			<div class="col-lg-10 col-md-12">
+				{% set itemSums = namespace(sum=0) %}
+				<center><h1 class="m-5">Report as of {{ date_friendly }}</h1></center>
+				<br>
+				<h3>At a glance</h3>
+				<div style="width: 40%; height: 40%;" class="d-inline-block"><canvas id="graph-types"></canvas></div>
+				<div style="width: 40%; height: 40%;" class="d-inline-block"><canvas id="graph-cats"></canvas></div>
+				<table class="table w-75">
+					<thead>
+						<th class="text-center">Description</th>
+						<th class="text-center">Values</th>
+					</thead>
+					<tbody>
+
+						<tr class="table-success">
+							<td><h3>Total Items:</h3></td>
+							<td class="text-center"><h3>{{ totalItems }}</h3></td>
+						</tr>
+						{% set itemTypeSums = {} %}
+						{% set itemTypeCounts = {} %}
+						{% for itemType, items in itemsPerType.items() %}
+							{% if items | length > 1 %}
+
+								{% set itemSums = namespace(sum=0) %}
+								{% for item in items %}
+									{% if itemType.name in itemTypeCounts %}
+										{% set itemTypeCounts = itemTypeCounts.update({itemType.name: itemTypeCounts[itemType.name] + 1 }) %}
+									{% else %}
+										{% set itemTypeCounts = itemTypeCounts.update({itemType.name: 1})%}
+									{% endif %}
+									{% if item.unsold == 1 %}
+										{% set itemSums.sum = itemSums.sum - item.price %}
+									{% else %}
+										{% set itemSums.sum = itemSums.sum + item.price %}
+									{% endif %}
+								{% endfor %}
+							{% endif %}
+							{% set itemTypeSums = itemTypeSums.update({itemType.name: itemSums.sum}) %}
+						{% endfor %}
+						{% if not best_selling == worst_selling %}
+							<tr class="table-success">
+								<td>Least Unsold Subcategory</td>
+								<td class="text-center"><b>{{ best_selling[0] }}</b> / <b style="color:red !important">{{ "-$%.2f"|format(best_selling[1]) }}</b></td>
+							</tr>
+						{% endif %}
+						{% if not worst_selling == [] %}
+							<tr class="table-danger">
+								<td>Most Unsold Subcategory</td>
+								<td class="text-center"><b>{{ worst_selling[0] }}</b> / <b style="color:red !important">{{ "-$%.2f"|format(worst_selling[1]) }}</b></td>
+							</tr>
+						{% endif %}
+					</tbody>
+				</table>
+				<table class="table table-hover w-75">
+					<thead>
+						<th></th>
+						<th></th>
+					</thead>
+					<tbody>
+						<tr class="pt-2">
+							<td colspan="2" class="text-center border border-dark text-white bg-primary"><h4><b>Items by Type</b></h4></td>
+						</tr>
+						
+						{% set attrUnsold = namespace(attrUnsold={}) %}
+						{% for itemType, itemCategories in itemsPerSubcategory.items() %}
+							<tr>
+								<td colspan="2" class="text-center text-white bg-secondary"><h5>{{ itemType.name }} / {{ itemTypeCounts[itemType.name] }} items - {% if itemTypeSums[itemType.name] < 0 %}<b style="color:#fc928b !important">{{ "$%.2f"|format(itemTypeSums[itemType.name]) }}</b>{% else %}<b>{{ "$%.2f"|format(itemTypeSums[itemType.name]) }}</b>{% endif %}</h5></td>
+							</tr>
+							{% for itemCategory, itemSubcategories in itemCategories.items() %}
+								{% if itemSubcategories | length >= 1 %}
+									<tr>
+										<td colspan="2" class="table-secondary text-center"><h6><b>{{ itemCategory.name }}</b></h6></td>
+									</tr>
+									{% for itemSubcategory, items in itemSubcategories.items() %}
+										{% if items | length >= 1 %}
+											<tr>
+												
+												<td><b>{{ itemSubcategory.name }}</b></td>
+												{% set attrSums = {} %}
+												
+												{% set attrPrices = {} %}
+												{% set itemSums = namespace(sum=0, selling=0, unsold=0) %}
+												{% for item in items %}
+													{% if item.unsold == 1 %}
+														{% set itemSums.unsold = itemSums.unsold + 1 %}
+														{% set itemSums.sum = itemSums.sum - item.price %}
+													{% else %}
+														{% set itemSums.selling = itemSums.selling + 1 %}
+														{% set itemSums.sum = itemSums.sum + item.price %}
+													{% endif %}
+
+													{% set attrValues = item.getAttributeValues() %}
+													{% for attr in item.getAttributes() %}
+														{% set attr_name_fixed = attr.getAttribute().attr_name.replace(" ", "_").replace("'", "").replace("\"", "") %}
+														{% if not attrValues[attr_name_fixed] in attrSums %}
+															{# if not attrValues[attr_name_fixed] in attrUnsold.attrUnsold %}
+																{% set attrUnsold.attrUnsold = attrUnsold.attrUnsold.update({attrValues[attr_name_fixed]: {}}) %}
+															{% endif %}
+
+															{ if item.unsold == 1 %}
+																{% if not 'unsold' in attrUnsold.attrUnsold[attrValues[attr_name_fixed]] %}
+																	{% set attrUnsold.attrUnsold = attrUnsold.attrUnsold.update({attrValues[attr_name_fixed]: {'unsold': 1 }})%}
+																{% else %}
+																	{% set attrUnsold.attrUnsold = attrUnsold,attrUnsold.update({attrValues[attr_name_fixed]: {'unsold': attrUnsold[attrValues[attr_name_fixed]]['unsold'] + 1 }}) %}
+																{% endif %}
+															{% else %}
+																{% if not 'selling' in attrUnsold.attrUnsold[attrValues[attr_name_fixed]] %}
+																	{% set attrUnsold.attrUnsold = attrUnsold.attrUnsold.update({attrValues[attr_name_fixed]: {'selling': 1 }})%}
+																{% else %}
+																	{% set attrUnsold.attrUnsold = attrUnsold.attrUnsold.update({attrValues[attr_name_fixed]: {'selling': attrUnsold[attrValues[attr_name_fixed]]['selling'] + 1 }}) %}
+																{% endif %}
+															{% endif #}
+
+															{% set attrSums = attrSums.update({attrValues[attr_name_fixed]: 1}) %}
+														{% else %}
+															{% set attrSums = attrSums.update({attrValues[attr_name_fixed]: attrSums[attrValues[attr_name_fixed]] + 1}) %}
+														{% endif %}
+
+
+													{% endfor %}
+													
+												{% endfor %}
+												<td class="text-right"><b>{{ items | length }} Items ({{ itemSums.selling }} Selling / {{ itemSums.unsold }} Unsold)</b> <br> {% if itemSums.sum > 0 %}<b style="color:green !important"> {{ "$%.2f"|format(itemSums.sum) }}</b>{% else %}<b style="color:red !important">{{ "$%.2f"|format(itemSums.sum) }}</b>{% endif %}</td>
+
+											</tr>
+
+											{% for attr_name, attr_sum in attrSums.items() %}
+												{% set attr_name_fixed = attr_name %}
+												<tr>
+													<td><i class="fas fa-level-up-alt fa-rotate-90 px-3"></i><i>{{ attr_name }}</i></td>
+													<td class="text-right">{{ attr_sum }} {# / ({{ attrUnsold.attrUnsold[attr_name_fixed]['selling'] }} Selling{% if 'unsold' in attrUnsold.attrUnsold[attr_name_fixed] %} / {{ attrUnsold.attrUnsold[attr_name_fixed]['unsold'] }} Unsold {% endif %}) #}</td>
+												</tr>
+											{% endfor %}
+										{% endif %}
+										<tr></tr>
+									{% endfor %}
+								{% endif %}
+							{% endfor %}
+						{% endfor %}
+
+
+					</tbody>
+				</table>
+			</div>
+		</center>
+	</div>
+	<div class="tab-pane fade te border" id="users-panel" role="tabpanel" aria-labelledby="user-counts">
+		<center style="margin-bottom: 10rem;">
+			<div class="col-lg-10 col-md-12">
+				<center><h1 class="m-5">User Report as of {{ date_friendly }}</h1></center>
+
+				<table class="table table-hover w-75" id="user-counts">
+					<thead class="text-center border border-dark text-white bg-primary">
+						<th>User Name</th>
+						<th>Items entered (past 30 days)</th>
+						<th>Items removed (past 30 days)</th>
+					</thead>
+					<tbody>
+						{% for user, counts in userCounts.items() %}
+							<tr class="text-center">
+								<td>{{ user }}</td>
+								<td>{% if 'input' in counts %}{{ counts['input'] }}{% else %}0{% endif %}</td>
+								<td>{% if 'removed' in counts %}{{ counts['removed'] }}{% else %}0{% endif %}</td>
+							</tr>
+						{% endfor %}
+
+					</tbody>
+				</table>
+			</div>
+		</center>
+	</div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+	<script src="{{ url_for('static', filename='js/jquery.tablesorter.js') }}"></script>
+	<script src="{{ url_for('static', filename='js/jquery.tablesorter.widgets.js') }}"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.bundle.min.js" integrity="sha256-xKeoJ50pzbUGkpQxDYHD7o7hxe0LaOGeguUidbq6vis=" crossorigin="anonymous"></script>
+	<script type="text/javascript">
+		window.chartColors = {
+	      red: 'rgb(255, 99, 132)',
+	      orange: 'rgb(255, 159, 64)',
+	      yellow: 'rgb(255, 205, 86)',
+	      green: 'rgb(75, 192, 192)',
+	      blue: 'rgb(54, 162, 235)',
+	      purple: 'rgb(153, 102, 255)',
+	      grey: 'rgb(201, 203, 207)'
+	    };
+		var config1 = {
+			type: 'pie',
+			data: {
+				datasets: [
+				{
+					data: [
+						{{ category_totals.values()|join(', ') }}
+					],
+					backgroundColor: [
+						"rgb(81,87,74)",
+						"rgb(68,124,105)",
+						"rgb(116,196,147)",
+						"rgb(142,140,109)",
+						"rgb(228,191,128)",
+						"rgb(233,215,142)",
+						"rgb(226,151,93)",
+						"rgb(241,150,112)",
+						"rgb(225,101,82)",
+						"rgb(201,74,83)",
+						"rgb(190,81,104)",
+						"rgb(163,73,116)",
+						"rgb(153,55,103)",
+						"rgb(101,56,125)",
+						"rgb(78,36,114)",
+						"rgb(145,99,182)",
+						"rgb(226,121,163)",
+						"rgb(224,89,139)",
+						"rgb(124,159,176)",
+						"rgb(86,152,196)",
+						"rgb(154,191,136)",
+						"rgb(255,20,23)",
+						"rgb(255,102,17)",
+						"rgb(255,136,68)",
+						"rgb(255,238,85)",
+						"rgb(254,254,56)",
+						"rgb(255,255,153)",
+						"rgb(170,204,34)",
+						"rgb(187,221,119)",
+						"rgb(200,207,130)",
+						"rgb(146,167,126)",
+						"rgb(85,153,238)",
+						"rgb(0,136,204)",
+						"rgb(34,102,136)",
+						"rgb(23,82,121)",
+						"rgb(85,119,119)",
+						"rgb(221,187,51)",
+						"rgb(211,167,109)",
+						"rgb(169,131,75)",
+						"rgb(170,102,136)",
+						"rgb(118,118,118)",
+						"rgb(127,0,0)",
+						"rgb(204,0,0)",
+						"rgb(255,68,68)",
+						"rgb(255,127,127)",
+						"rgb(255,178,178)",
+						"rgb(153,81,0)",
+						"rgb(204,108,0)",
+						"rgb(255,136,0)",
+						"rgb(255,187,51)",
+						"rgb(255,229,100)",
+						"rgb(44,76,0)",
+						"rgb(67,101,0)",
+						"rgb(102,153,0)",
+						"rgb(153,204,0)",
+						"rgb(210,254,76)",
+						"rgb(60,20,81)",
+						"rgb(107,35,142)",
+						"rgb(153,51,204)",
+						"rgb(170,102,204)",
+						"rgb(188,147,209)",
+						"rgb(0,76,102)",
+						"rgb(0,114,153)",
+						"rgb(0,153,204)",
+						"rgb(51,181,229)",
+						"rgb(142,213,240)",
+						"rgb(102,0,51)",
+						"rgb(178,0,88)",
+						"rgb(229,0,114)",
+						"rgb(255,50,152)",
+						"rgb(255,127,191)"
+					],
+					label: 'Items Per category'
+				}
+				],
+				labels: [
+					{% for cat in category_totals.keys() %}
+						'{{ cat }}'{% if not loop.last %},{% endif %}
+					{% endfor %}
+				]
+			},
+			options: {
+				responsive: true,
+				title: {
+		            display: true,
+		            text: 'Items Per Category'
+		        }
+			}
+		};
+		var config2 = {
+			type: 'pie',
+			data: {
+				datasets: [
+				{
+					data: [
+						{{ type_item_totals.values()|join(', ') }}
+					],
+					backgroundColor: [
+						"rgb(81,87,74)",
+						"rgb(68,124,105)",
+						"rgb(116,196,147)",
+						"rgb(142,140,109)",
+						"rgb(228,191,128)",
+						"rgb(233,215,142)",
+						"rgb(226,151,93)",
+						"rgb(241,150,112)",
+						"rgb(225,101,82)",
+						"rgb(201,74,83)",
+						"rgb(190,81,104)",
+						"rgb(163,73,116)",
+						"rgb(153,55,103)",
+						"rgb(101,56,125)",
+						"rgb(78,36,114)",
+						"rgb(145,99,182)",
+						"rgb(226,121,163)",
+						"rgb(224,89,139)",
+						"rgb(124,159,176)",
+						"rgb(86,152,196)",
+						"rgb(154,191,136)",
+						"rgb(255,20,23)",
+						"rgb(255,102,17)",
+						"rgb(255,136,68)",
+						"rgb(255,238,85)",
+						"rgb(254,254,56)",
+						"rgb(255,255,153)",
+						"rgb(170,204,34)",
+						"rgb(187,221,119)",
+						"rgb(200,207,130)",
+						"rgb(146,167,126)",
+						"rgb(85,153,238)",
+						"rgb(0,136,204)",
+						"rgb(34,102,136)",
+						"rgb(23,82,121)",
+						"rgb(85,119,119)",
+						"rgb(221,187,51)",
+						"rgb(211,167,109)",
+						"rgb(169,131,75)",
+						"rgb(170,102,136)",
+						"rgb(118,118,118)",
+						"rgb(127,0,0)",
+						"rgb(204,0,0)",
+						"rgb(255,68,68)",
+						"rgb(255,127,127)",
+						"rgb(255,178,178)",
+						"rgb(153,81,0)",
+						"rgb(204,108,0)",
+						"rgb(255,136,0)",
+						"rgb(255,187,51)",
+						"rgb(255,229,100)",
+						"rgb(44,76,0)",
+						"rgb(67,101,0)",
+						"rgb(102,153,0)",
+						"rgb(153,204,0)",
+						"rgb(210,254,76)",
+						"rgb(60,20,81)",
+						"rgb(107,35,142)",
+						"rgb(153,51,204)",
+						"rgb(170,102,204)",
+						"rgb(188,147,209)",
+						"rgb(0,76,102)",
+						"rgb(0,114,153)",
+						"rgb(0,153,204)",
+						"rgb(51,181,229)",
+						"rgb(142,213,240)",
+						"rgb(102,0,51)",
+						"rgb(178,0,88)",
+						"rgb(229,0,114)",
+						"rgb(255,50,152)",
+						"rgb(255,127,191)"
+					],
+					label: 'Items Per category'
+				}
+				],
+				labels: [
+					{% for type in type_item_totals.keys() %}
+						'{{ type }}'{% if not loop.last %},{% endif %}
+					{% endfor %}
+				]
+			},
+			options: {
+				responsive: true,
+				title: {
+		            display: true,
+		            text: 'Items Per Type'
+		        }
+			}
+		};
+		window.onload = function() {
+			var ctx1 = $("#graph-cats");
+			var ctx2 = $("#graph-types");
+			window.catPie = new Chart(ctx1, config1);
+			window.typePie = new Chart(ctx2, config2);
+		};
+
+
+
+		$(function(){
+			$('#user-counts').tablesorter({
+				widgets        : ['zebra', 'columns'],
+				usNumberFormat : false,
+				sortReset      : true,
+				sortRestart    : true
+			});
+		});
+	</script>
+{% endblock %}

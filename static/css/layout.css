@@ -1,0 +1,28 @@
+#wrap {
+	margin-top: 60px;
+}
+#overlay {
+    background: #ffffff;
+    color: #666666;
+    height: 100%;
+    width: 100%;
+    z-index: 5000;
+    text-align: center;
+    padding:20%;
+	margin:auto;
+}
+#overlay img {
+	margin: auto;
+}
+#message-container {
+	margin-top: 20px;
+}
+.h-80 {
+    height: 80%;
+}
+.h-75 {
+    height: 75%;
+}
+.h-20 {
+    height: 20%;
+}

@@ -1,0 +1,93 @@
+
+<head>
+	
+	<link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+	<link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+	
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+	<script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
+	
+	{% block head %}{% endblock %}
+</head>
+
+<body>
+	<style>
+		#overlay {
+			background: #ffffff;
+			color: #666666;
+			position: fixed;
+			height: 100%;
+			width: 100%;
+			z-index: 5000;
+			top: 0;
+			left: 0;
+			float: left;
+			text-align: center;
+			padding-top: 1rem;
+		}
+		#overlay img {
+			margin:auto;
+		}
+	</style>
+	<div id="overlay">
+		<img src="{{ url_for('static', filename='css/ajax-loader.gif') }}" alt="Loading" /><br/>
+		Loading...
+	</div>
+	<script>
+		$(window).on('load', function(){
+			$('#overlay').fadeOut();
+		});
+	</script>
+	<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+	  <a class="navbar-brand" href="{{ url_for('home') }}"><img src="{{ url_for('static', filename='img/goodwill.png') }}" width="50px" class="img-fluid" /></a>
+	  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+		<span class="navbar-toggler-icon"></span>
+	  </button>
+	  <div class="collapse navbar-collapse" id="navbarText">
+		<ul class="navbar-nav mr-auto">
+			{% block navbar_left %}
+				
+			{% endblock %}
+			<a href="{{ url_for('home') }}" class="text-white">Menu</a>
+		</ul>
+		<span class="navbar-text">
+			{% block navbar_right %}
+				<a href="{{ url_for("logout") }}?">Log Out</a>
+			{% endblock %}
+		</span>
+	  </div>
+	</nav>
+
+	<div class="container" id="message-container">
+		{% if error %}
+			<div class="alert alert-danger fade show" role="alert">
+				{{ error }}
+				<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+		{% endif %}
+		{% if success %}
+			<div class="alert alert-success fade show" role="alert">
+				{{ success }}
+				<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+		{% endif %}
+	</div>
+	<div class="container-fluid" id="wrap">
+		{% block body %}{% endblock %}
+	
+	</div>
+
+
+	<script type="text/javascript" src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.bundle.min.js"></script>
+
+	
+	<script type="text/javascript">
+		$('.alert').alert()
+		
+	</script>
+	{% block scripts %}{% endblock %}
+</body>

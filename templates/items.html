@@ -1,0 +1,212 @@
+{% extends 'layout.html' %}
+
+{% block head %}
+<link href="{{ url_for('static', filename='fontawesome-free-5.9.0-web/css/all.css') }}" rel="stylesheet" type="text/css">
+<link rel="stylesheet" href="{{ url_for('static', filename='fonts/css/all.min.css') }}">
+<script src="{{ url_for('static', filename='js/jquery.tablesorter.js') }}"></script>
+<script src="{{ url_for('static', filename='js/jquery.tablesorter.widgets.js') }}"></script>
+
+{% endblock %}
+
+{% block navbar_left %}
+{% endblock %}
+
+{% block body %}
+	<center><h1>Categorization Options</h1></center>
+	<div class="float-right">
+		<div class="col-lg-1 p-2 mr-5">
+			<a tabindex="0" class="btn btn-lg btn-success" id="plus-btn" role="button" data-toggle="popover">
+				<i class="fas fa-plus r-2"></i>
+			</a>
+		</div>
+	</div>
+	<div class="w-75 mx-auto mt-5">
+		<ul class="nav nav-tabs" id="myTab" role="tablist">
+			<li class="nav-item">
+		    	<a class="nav-link active" id="types-tab" data-toggle="tab" href="#types-panel" role="tab" aria-controls="types-panel" aria-selected="true">Types</a>
+		  	</li>
+		  	<li class="nav-item">
+		    	<a class="nav-link" id="categories-tab" data-toggle="tab" href="#categories-panel" role="tab" aria-controls="categories-panel">Categories</a>
+		  	</li>
+		  	<li class="nav-item">
+		   		<a class="nav-link" id="subcategories" data-toggle="tab" href="#subcategories-panel" role="tab" aria-controls="subcategories-panel">Subcategories</a>
+		  	</li>
+		  	<li class="nav-item">
+		   		<a class="nav-link" id="attributes" data-toggle="tab" href="#attr-panel" role="tab" aria-controls="attr-panel">Attributes</a>
+		  	</li>
+		</ul>
+		<div class="tab-content" id="myTabContent">
+
+		  <div class="tab-pane fade te border" id="subcategories-panel" role="tabpanel" aria-labelledby="subcategories">
+		  	<table class="table table-hover table-striped text-center mx-auto">
+			  	<thead>
+					<tr>
+					  <th></th>
+					  <th scope="col">Type</th>
+					  <th scope="col">Category</th>
+					  <th scope="col">Subcategory</th>
+					</tr>	
+		  		</thead>
+			  	<tbody>
+			  		{% for subcategory in subcategories %}
+						<tr>
+							<td><img src="{{ url_for('static', filename='img/' + subcategory.icon) }}" width="35px" /></td>
+						  	<td>{{ subcategory.getType().name }}</td>
+						  	<td>{{ subcategory.getCategory().name }}</td>
+						  	<td>{{ subcategory.name }}</td>
+						  	
+						  	<td class="text-center"><a href="{{ url_for('editSubcategory', sub_id=subcategory.id) }}""><i style="font-size:20px;" class="fas pl-2 fa-edit color-yellow"></i></a><a href="#" class="remover" data-todelete="subcategory" data-delete="{{ subcategory.id }}"><i class="fas pl-2 fa-trash color-red"></i></a></td>
+						</tr>
+					{% endfor %}
+			  	</tbody>
+			</table>
+		  </div>
+		  <div class="tab-pane fade border" id="categories-panel" role="tabpanel" aria-labelledby="categories-panel">
+		  	<table class="table table-hover table-striped text-center">
+			  	<thead>
+					<tr>
+						<th></th>
+						<th scope="col">Type</th>
+					  	<th scope="col">Category</th>
+					</tr>	
+		  		</thead>
+			  	<tbody>
+			  		{% for category in categories %}
+						<tr>
+							<td><i class="fas {{ category.icon }} fa-2x"></i></td>
+						  	<td>{{ category.getType().name }}</td>
+						  	<td>{{ category.name }}</td>
+						  	
+						  	<td class="text-center"><a href="{{ url_for('editCategory', id=category.id) }}""><i style="font-size:20px;" class="fas pl-2 fa-edit color-yellow"></i></a><a href="#" class="remover" data-todelete="category" data-delete="{{ category.id }}"><i style="font-size:20px;" class="fas pl-2 fa-trash color-red"></i></a></td>
+						</tr>
+					{% endfor %}
+			  	</tbody>
+			</table>
+		  </div>
+		  <div class="tab-pane show fade active border" id="types-panel" role="tabpanel" aria-labelledby="types-panel">
+		  	<table class="table table-hover table-striped text-center">
+			  	<thead>
+					<tr>
+						<th></th>
+					  	<th scope="col">Type</th>
+					</tr>	
+		  		</thead>
+			  	<tbody>
+			  		{% for type in types %}
+						<tr>
+							<td><i class="fas {{ type.icon }} fa-2x"></i></td>
+						  	<td>{{ type.name }}</td>
+						  	
+						  	<td class="text-center my-auto"><a href="{{ url_for('editType', id=type.id) }}""><i style="font-size:20px;" class="fas pl-2 fa-edit color-yellow"></i></a><a href="#" class="remover" data-todelete="type" data-delete="{{ type.id }}"><i style="font-size:20px;" class="fas pl-2 fa-trash color-red"></i></a></td>
+						</tr>
+					{% endfor %}
+			  	</tbody>
+			</table>
+		  </div>
+		  <div class="tab-pane fade border" id="attr-panel" role="tabpanel" aria-labelledby="attr-panel">
+		  	<table class="table table-hover table-striped text-center">
+			  	<thead>
+					<tr>
+					  	<th scope="col">Attribute</th>
+					</tr>	
+		  		</thead>
+			  	<tbody>
+			  		{% for attribute in attributes %}
+						<tr>
+						  	<td>{{ attribute.attr_name }}</td>
+						  	
+						  	<td class="text-center my-auto"><a href="{{ url_for('editAttribute', id=attribute.id) }}"><i style="font-size:20px;" class="fas pl-2 fa-edit color-yellow"></i></a><a href="#" class="remover" data-todelete="attribute" data-delete="{{ attribute.id }}"><i style="font-size:20px;" class="fas pl-2 fa-trash color-red"></i></a></td>
+						</tr>
+					{% endfor %}
+			  	</tbody>
+			</table>
+		  </div>
+		</div>
+		</div>
+	</div>
+	
+{% endblock %}
+
+{% block scripts %}
+	<script type="text/javascript">
+		$("[data-toggle=popover]").popover({
+			html: true, 
+			content: function() {
+			      return "<div class='text-center'><a href='{{ url_for('addType') }}' class='btn btn-success text-white m-1'>Add Type</a><br><a href='{{ url_for('addCategory') }}' class='btn btn-success text-white m-1'>Add Category</a><br><a href='{{ url_for('addSubcategory') }}' class='btn btn-success text-white m-1'>Add Subcategory</a><a href='{{ url_for('addAttribute') }}' class='btn btn-success text-white m-1'>Add Attribute</a></div>"
+			    }
+		});
+
+		$(".remover").on("click", function() {
+			_t = this
+			if ($(this).attr("data-todelete") == "category") {
+				$.post("{{ url_for('deleteCategory') }}", {"categoryID": $(this).attr("data-delete")}, function(data) {
+					if (data == true) {
+						$("#message-container").append("<div class=\"alert alert-success alert-dismissible fade show\" role=\"alert\"><strong>Item Removed</strong><button type=\"button\" class=\"close\" data-dismiss=\"alert\" aria-label=\"Close\"><span aria-hidden=\"true\">&times;</span></button></div>")
+						$(_t).parent().parent().remove()
+					}
+					if (data == false) {
+						$("#message-container").append("<div class=\"alert alert-danger alert-dismissible fade show\" role=\"alert\"><strong>There was an issue deleting that product.</strong><button type=\"button\" class=\"close\" data-dismiss=\"alert\" aria-label=\"Close\"><span aria-hidden=\"true\">&times;</span></button></div>")
+					}
+				})
+			} else if ($(this).attr("data-todelete") == "subcategory") {
+				$.post("{{ url_for('deleteSubcategory') }}", {"subcategoryID": $(this).attr("data-delete")}, function(data) {
+					if (data == true) {
+						$("#message-container").append("<div class=\"alert alert-success alert-dismissible fade show\" role=\"alert\"><strong>Item Removed</strong><button type=\"button\" class=\"close\" data-dismiss=\"alert\" aria-label=\"Close\"><span aria-hidden=\"true\">&times;</span></button></div>")
+						$(_t).parent().parent().remove()
+					}
+					if (data == false) {
+						$("#wrap .container").append("<div class=\"alert alert-danger alert-dismissible fade show\" role=\"alert\"><strong>There was an issue deleting that product.</strong><button type=\"button\" class=\"close\" data-dismiss=\"alert\" aria-label=\"Close\"><span aria-hidden=\"true\">&times;</span></button></div>")
+					}
+				})
+			} else if ($(this).attr("data-todelete") == "type") {
+				$.post("{{ url_for('deleteType') }}", {"typeID": $(this).attr("data-delete")}, function(data) {
+					if (data == true) {
+						$("#message-container").append("<div class=\"alert alert-success alert-dismissible fade show\" role=\"alert\"><strong>Item Removed</strong><button type=\"button\" class=\"close\" data-dismiss=\"alert\" aria-label=\"Close\"><span aria-hidden=\"true\">&times;</span></button></div>")
+						$(_t).parent().parent().remove()
+					}
+					if (data == false) {
+						$("#message-container").append("<div class=\"alert alert-danger alert-dismissible fade show\" role=\"alert\"><strong>There was an issue deleting that product.</strong><button type=\"button\" class=\"close\" data-dismiss=\"alert\" aria-label=\"Close\"><span aria-hidden=\"true\">&times;</span></button></div>")
+					}
+				})
+			} else if ($(this).attr("data-todelete") == "attribute") {
+				$.post("{{ url_for('deleteAttribute') }}", {"attributeID": $(this).attr("data-delete")}, function(data) {
+					if (data == true) {
+						$("#message-container").append("<div class=\"alert alert-success alert-dismissible fade show\" role=\"alert\"><strong>Attribute Removed</strong><button type=\"button\" class=\"close\" data-dismiss=\"alert\" aria-label=\"Close\"><span aria-hidden=\"true\">&times;</span></button></div>")
+						$(_t).parent().parent().remove()
+					}
+					if (data == false) {
+						$("#message-container").append("<div class=\"alert alert-danger alert-dismissible fade show\" role=\"alert\"><strong>There was an issue deleting that Attribute.</strong><button type=\"button\" class=\"close\" data-dismiss=\"alert\" aria-label=\"Close\"><span aria-hidden=\"true\">&times;</span></button></div>")
+					}
+				})
+			}
+			
+		})
+
+	</script>
+
+
+	<script type="text/javascript">
+		$(function(){
+			$('#types-panel table').tablesorter({
+				widgets        : ['zebra', 'columns'],
+				usNumberFormat : false,
+				sortReset      : true,
+				sortRestart    : true
+			});
+			$('#categories-panel table').tablesorter({
+				widgets        : ['zebra', 'columns'],
+				usNumberFormat : false,
+				sortReset      : true,
+				sortRestart    : true,
+				sortForce: [[3,1]]
+			});
+			$('#subcategories-panel table').tablesorter({
+				widgets        : ['zebra', 'columns'],
+				usNumberFormat : false,
+				sortReset      : true,
+				sortRestart    : true,
+				sortForce: [[2,1]]
+			});
+		});
+	</script>
+{% endblock %}
